@@ -4,7 +4,9 @@ Text file format -> line starting with ' indicates a task,  "- done" on the end 
 The date on the text file is used as the date of the task in mm - dd - yy
 
 
-All Configuration performed in .conf file created in main.py root directory
+All Configuration performed in .conf file created in dbmanage.py root directory
+
+Service run with "python3 dbmanage.py -p {insert pid file here}"
 
 .conf format:
 ```
