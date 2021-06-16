@@ -1,0 +1,57 @@
+fix nextcloud speed
+
+delete function deletes all qued events in a text file at once
+
+
+
+Make add task not put more lines than it needs to
+
+make it so it doesnt abliterate todoist task times when edited
+
+
+
+Add error logging - done
+
+Add conf file - done
+
+api pulls changed files to local folder and runs progam only on changed files, - done
+api checks if changes made on api end and runs editing and pushing only files modified to server, - done
+	- add run flag to compare only api side or only certain files - done
+
+
+
+conditionally run on modify, check is modified section - done
+	Always run on add/remove - done
+		Only need to modify any other staged changes to same files loc
+			alter varibile to indicate change has been made and rerun compare and update for db to agree
+
+make sure add function works with items with a description - done
+
+add conditional updating, ex dont need to query todoist to change line num - done
+
+
+Create pruner function to stop syncing really old events and empty event - archive feature takes care of
+
+See if can retrieve more complete Todo task list - done
+
+Task modification:
+	Insert new task function - takes in attributes, sends new task to end of file - done
+
+	modify task function - takes in task id, deletes and reinserts line with updated text description or status - done
+		REMEMBER TO REPARSE ALL ITEMS IN FILE WHEN MODIFIED
+
+	delete task - takes in id deletes line and new line underneath if exists - done
+		REMEMBER TO REPARSE ALL ITEMS IN FILE WHEN MODIFIED
+	
+Status Updating:
+
+	Function that compares all text and todoist entries to db - done
+		- compares id of todoist and if changed calls modify entry function - done
+		- if todoist created, create, if text created create - done
+		- Text file takes precident always - done
+
+Create db function with .add .remove .compare .commit .read
+	- create struct for complete event data storage (name, description, completion, date, todoist id, id) - done
+	- compare doesn't see order, if task "removed" and new one "created" check for similarities to edit rather than replace if more than one, otherwise just edit - done
+
+

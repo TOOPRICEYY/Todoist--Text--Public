@@ -1,0 +1,7 @@
+*.code-workspace
+backup/*
+examples/*
+.*
+!.gitignore
+*.log
+*__pycache__/*
