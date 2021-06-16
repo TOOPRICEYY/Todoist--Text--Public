@@ -6,7 +6,7 @@ The date on the text file is used as the date of the task in mm - dd - yy
 
 All Configuration performed in .conf file created in dbmanage.py root directory
 
-Service run with "python3 dbmanage.py -p {insert pid file here}"
+Run service with "python3 dbmanage.py -p {insert pid file here}"
 
 .conf format:
 ```

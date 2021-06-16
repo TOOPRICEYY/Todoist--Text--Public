@@ -473,21 +473,20 @@ def get_event_diff(event, dbevent):
 
 config = Config(dir)
 
-#logging.basicConfig(filename=config.get_log_loc(), 
-#                    format='%(asctime)s %(levelname)s %(name)s %(message)s')  # commeting out all logging config allows errors to be printed again
-#logger=logging.getLogger(__name__)
-main(config) 
+logging.basicConfig(filename=config.get_log_loc(), 
+                    format='%(asctime)s %(levelname)s %(name)s %(message)s')  # commeting out all logging config allows errors to be printed again
+logger=logging.getLogger(__name__)
 
-# try:
-#     writePidFile()
-#     while True: 
-#         start_time = time.time()
-        
-#         print("--- %s seconds ---" % (time.time() - start_time)) 
-#         time.sleep(config.get_refresh_int())
-# except Exception as e:
-#    logger.error(e)
-#    print(e)
-#    time.sleep(config.get_refresh_int())
+try:
+     writePidFile()
+     while True: 
+         start_time = time.time()
+          main(config) 
+         print("--- %s seconds ---" % (time.time() - start_time)) 
+         time.sleep(config.get_refresh_int())
+except Exception as e:
+    logger.error(e)
+    print(e)
+    time.sleep(config.get_refresh_int())
                                  
             
