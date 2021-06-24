@@ -25,14 +25,24 @@ class modifier:
             with open(loc, "r") as f:
                 lines = f.readlines()
             with open(loc, "w+") as f:
-                for x in range(0,len(lines)):
-                    if(x+1==event.get_linenums()[0]):
-                        f.write('\''+event.gen_line()+' \n')
-                        print(event.gen_line())
-                    elif (x+1>=event.get_linenums()[0] and x+1<=event.get_linenums()[1]):
-                        None
-                    else:
+                for x in range(0,event.get_linenums()[0]-1):
+                    try:
                         f.write(lines[x])
+                    except:
+                        print("too many changes at once")
+
+                gen_line = event.gen_line()
+                f.write('\''+gen_line+' \n')
+
+                x = event.get_linenums()[1]+1
+                while x < len(lines):
+                    f.write(lines[x])
+                    x+=1
+                   
+
+                event.set_linenums([event.get_linenums()[0],(event.get_linenums()[0]+amount_of_lines(gen_line)-1)]) # update line numbers
+
+                        
 
 
     def addTask(self,even,mod): # adds event returns added event
@@ -48,14 +58,8 @@ class modifier:
             f.write('\''+event.gen_line())
             print(event.gen_line())
         f.close()
-        i = 0
-        if event.get_description()!=None:
-            i=1
-            for c in event.get_description():
-                if c == '\n':
-                    i+=1
         len = file_len(loc)
-        event.set_linenums([len,len+i])
+        event.set_linenums([(len-amount_of_lines(event.gen_line())+1),len])
         return event
         
     def removeTask(self,event,mod): # removes event from list

@@ -24,14 +24,11 @@ class nextcloud_api():
 
     def get_curr_mods(self):
         l =  get_all_valid_files(self.client)
-        del l[0] 
         return l
 
     def pull(self,old_files): # returns all files modified since last time stamp and downloads to local folder
         files = []
         l = get_all_valid_files(self.client)
-       
-        del l[0] 
         neg = []
         pos = list(l)
         mod = []
@@ -84,11 +81,15 @@ class nextcloud_api():
             text = r.encode('latin-1','ignore')
             requests.put(self.url+f, verify=False, data=text,auth=(self.usr, self.pswrd))
             time.sleep(.1)
-        temp = files
+        temp = list(files)
         compare_time = dateparser.parse("15 seconds ago +00:00")
 
         while temp!=[]: # validate files were changed
             mods = self.get_curr_mods()
+            time.sleep(.2)
+            files = list(temp)
+            print("Nextcloud Post Verify Cycle")
+            print(files)
             for f in files:
                 for i in mods:
                     if i['name'] == f:
@@ -107,6 +108,7 @@ class nextcloud_api():
 def get_all_valid_files(client):
     files = []
     l = client.list(get_info=True)
+    #print(l)
     del l[0]
     for i in l:
         if i['isdir'] == False:

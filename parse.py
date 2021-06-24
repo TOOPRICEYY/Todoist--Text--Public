@@ -24,28 +24,23 @@ def parseEntries(filesNames, dir):
                     l = 0
                 else:
                     l += 1
-                    if l < 4:
+                    if l <= 2:
                         k = linesToChar(line)
                         #print(eventList[len(eventList)-1].get_line())
                         #print(line)
                         #print(i)
                         if k-d > 1 and k-d < 10:
                             #print("added")
+                            l=0
                             b = 0
                             for c in line:
-                                if c.isalnum():
+                                if c.isalnum() and c!="-":
                                     break
                                 b+=1
-                            descript = eventList[len(eventList)-1].get_description()
-                            v = 0
-                            if line[len(line)-1] == '\n':
-                                v = 1
-                            if descript != None:
-                                descript = str(descript)
-                                descript += '\n'+line[b:len(line)-v]
-                            else:
-                                descript = line[b:len(line)-v]
-                            eventList[len(eventList)-1].set_description(descript)
+
+                            v = 1 if line[len(line)-1] == '\n' else 0
+    
+                            eventList[len(eventList)-1].add_description_by_line(line[b:len(line)-v])
                             arrtemp = eventList[len(eventList)-1].get_linenums()
                             arrtemp[1] = linenum
                             eventList[len(eventList)-1].set_linenums(arrtemp)

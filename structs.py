@@ -1,5 +1,22 @@
 import os.path
+import time
 from os import path
+
+class Description:
+    def __init__(self):
+        self.text = None
+        self.id = None
+        self.completed = False
+        self.deleted = False
+        self.modified = False
+        self.parent_id =  None
+        
+    def db_in(self,text,completed,id,parent_id):
+        self.text = text
+        self.completed = completed
+        self.id = id
+        self.parent_id = parent_id
+        
 
 class Event:
     completed_str = ["done","complete","finish","clapped","postponed","incomplete"]
@@ -9,7 +26,7 @@ class Event:
         self.date = None
         self.time = None
         self.completed = None
-        self.description = None
+        self.description = []
         self.Todoid = None
         self.id = None
         self.modified =  False
@@ -46,11 +63,34 @@ class Event:
         self.name = name
         self.date = date
         self.completed = completed
-        self.description = description
+        self.description = [] if description==None else description
         self.Todoid = Todoid
         self.id = id
         self.line = line
         self.linenums = linenums
+
+    def add_description_by_line(self,line):
+        l = findFirst(line,"-",False)
+        self.completed = False
+        descript = Description()
+        if l != -1:
+            temp = line[l+1:len(line)]
+            for item in self.completed_str:
+                if not temp.find(item)==-1:
+                    descript.completed = True
+                    index = findFirst(line,"-",False)
+                    if(line[index-1]==" "):
+                        line = line[0:index-1] # no more done 
+                    else:
+                        line = line[0:index]
+                    break
+
+        descript.text = line.strip()
+        self.description.append(descript)
+        return
+
+    def append_description(self, item):
+        self.description.append(item)
 
     def notWhiteSpace(self,c):
         if c == '\n' or c == '\t' or c == ' ':
@@ -61,10 +101,20 @@ class Event:
     def get_line(self):
         return self.gen_line()
 
-    def print(self):
+    def print_line(self):
         l = "  edited " + self.edit.get_str() if self.edit != None else ""  
         a = " is archived " if self.archived else ""
-        print(str(self.name) + "  " + str(dateToStr(self.date)) +"  completed: " + str(self.completed) + "  description: " + str(self.description) + "  line: " +str(self.linenums) + "  id: " + str(self.id) + "  todoId: " + str(self.Todoid) + a + l)
+        descript = ''
+        for i in self.description:
+            descript = descript + "\n- " + i.text +  str(" (done)" if i.completed else "") + str(" (deleted)" if i.deleted else "") + str(" (modified)" if i.modified else "") + str(" (id:"+str(i.id)+")" if i.id != None else " (no id)")
+        return str(self.name) + "  " + str(dateToStr(self.date)) +"  completed: " + str(self.completed) + "  description: " + descript + "  \nline: " +str(self.linenums) + "  id: " + str(self.id) + "  todoId: " + str(self.Todoid) + a + l
+
+    def print(self):
+        print(self.print_line())
+
+    def __str__(self):
+        return self.print_line()
+
 
     def parseLine(self,line):
         l = findFirst(line,"-",False)
@@ -89,21 +139,24 @@ class Event:
         text = ""
         if self.completed:
             text = " - done"
-        if self.description!=None :
-            text += "\n\t"
-            for c in self.description:
-                if c=='\n':
-                    text+="\n\t"
-                else:
-                    text+=c
-            return self.name + text
-        else: 
-            return self.name + text
+        initial = True
+        for x in self.description:
+            if not x.deleted:
+                text += "\n\t-" + x.text + (" - done" if x.completed else "")
+            
+
+        return self.name + text
         
 
     def set_file_change(self,f):
         self.file_change  = f
     
+    def add_edit(self,f):
+        if self.edit != None:
+            self.edit.sum(f)
+        else:
+            self.edit = f
+
     def get_file_change(self):
         return self.file_change
 
@@ -155,6 +208,14 @@ class Event:
         self.linenums = linenums
     def get_linenums(self):
         return self.linenums
+
+
+def amount_of_lines(txt):
+    itter = 1
+    for s in txt:
+        if s == "\n":
+            itter+=1
+    return itter
 
 def dateToStr(a):
     try:
@@ -287,9 +348,17 @@ class file_change():
         self.completed = False
         self.name = False
         self.lineNum = False
+        self.description = False
+
+    def sum(self,f):
+        self.date = self.date or f.get_date()
+        self.completed = self.completed or f.get_completed()
+        self.name = self.name or f.get_name()
+        self.lineNum = self.lineNum or f.get_lineNum()
+        self.description = self.description or f.get_description()
 
     def api_change_needed(self):
-        if self.date or self.name or self.completed:
+        if self.date or self.name or self.completed or self.description:
             return True
         return False
 
@@ -309,6 +378,11 @@ class file_change():
         self.lineNum = f
     def get_lineNum(self):
         return self.lineNum
+    def get_description(self):
+        return self.description
+    def description_edit(self, f):
+        self.description = f
+
     
     def get_str(self):
         s = ""
@@ -329,7 +403,11 @@ class file_change():
                 s = s+", linenum"
             else:
                 s = "linenum"
-        
+        if self.description:
+            if s!="":
+                s = s+", description"
+            else:
+                s = "description"
         return s
 
 def remove_all_events_before_date(events,date):
@@ -364,6 +442,22 @@ def get_all_events_with_dates(dates,events):
                 break
 
     return temp
+
+class timeCircut():
+    def __init__(self):
+        self.start_time = 0
+        self.banner = ""
+        self.enabled = True
+    def run(self, run):
+        self.enabled = run
+    def start(self,text):
+        if self.enabled:
+            self.banner = text
+            self.start_time = time.time()
+    def stop(self):
+        if self.enabled:
+            print("\n"+self.banner+" took %s seconds" % (time.time() - self.start_time)+"\n")
+
 
 def findFirst(str,f,dir): #dir=true start at beginning, finds first instance matching str in f, indexed at beginning of string
     index = -1
