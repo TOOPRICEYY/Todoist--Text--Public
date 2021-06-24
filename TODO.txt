@@ -1,8 +1,29 @@
-fix nextcloud speed
+descriptions:
+	
+	-impliment indexed matching at least for todoist side 
+	
+	-compare and update edit class all in one proccess
+
+	-delete in bulk per file or algor to update line numbers
+
+Done
+	-Todoist write
+	- Todoist api description reading ability - make efficent
+	- db reading/writing ability
+	- edit description writting/reading capibility, read in done state on description lines
+	- compare marks to cull overflowed descriptions, also compare for verbatim match as to not need to modify every time, dont check completed api side description changes
+
+
+
+
+
+
+
+
+
+
 
 delete function deletes all qued events in a text file at once
-
-
 
 Make add task not put more lines than it needs to
 
